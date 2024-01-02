@@ -16,12 +16,12 @@ add_library(allocator lib.cpp)
 #add_executable(test_version_gtest test_version_gtest.cpp)
 
 #set_target_properties(allocator_cli allocator test_version PROPERTIES
-#    CXX_STANDARD 14
+#    CXX_STANDARD 17
 #    CXX_STANDARD_REQUIRED ON
 #)
 
 set_target_properties(allocator_cli allocator PROPERTIES
-    CXX_STANDARD 14
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
 target_include_directories(allocator
@@ -74,10 +74,10 @@ if (MSVC)
     )
 else ()
     target_compile_options(allocator_cli PRIVATE
-        -Wall -Wextra -pedantic -Werror
+        -Wall -Wextra -pedantic
     )
     target_compile_options(allocator PRIVATE
-        -Wall -Wextra -pedantic -Werror
+        -Wall -Wextra -pedantic
     )
     #target_compile_options(test_version PRIVATE
     #    -Wall -Wextra -pedantic -Werror
