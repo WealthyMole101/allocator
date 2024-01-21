@@ -41,16 +41,15 @@ void test_map(std::map<T, T, std::less<int>, Allocator> map_arg)
     }
 }
 
-
 int main (int, char **) 
 {
-    cpp_11_allocator<int> allocator;
-    ForwardList<int, cpp_11_allocator<int>> forward_list_0(allocator);
+    pool_allocator<int> allocator;
+    ForwardList<int, pool_allocator<int>> forward_list_0(allocator);
     ForwardList<int> forward_list_1;
 
     std::map<int, int> map_0;
-    cpp_11_allocator<int> allocator_map;
-    std::map<int, int, std::less<int>, cpp_11_allocator<int>> map_1(allocator_map);
+    pool_allocator<int> allocator_map;
+    std::map<int, int, std::less<int>, pool_allocator<int>> map_1(allocator_map);
 
     test_forward_list(forward_list_0);
     test_forward_list(forward_list_1);

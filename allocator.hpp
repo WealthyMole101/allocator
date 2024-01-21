@@ -2,70 +2,56 @@
 
 #include <iostream>
 #include <memory>
-
-//struct deleter
-//{
-//    void operator()(void* ptr)
-//    {
-//        ::operator delete(ptr);
-//    }
-//};
+#include <cstring>
 
 template <class T>
-struct cpp_11_allocator {
-    using value_type = T;
+struct pool_allocator
+{
+    typedef T value_type;
 
-    cpp_11_allocator () noexcept
-    {
+    static int pos;
+    static constexpr int size = sizeof(T) * 1000;
+    static uint8_t data[size];
 
+    pool_allocator () noexcept {}
+    ~pool_allocator() {}
+
+    template <class U> pool_allocator  (const pool_allocator <U>&) noexcept {}
+
+    T* allocate (std::size_t n) {
+        if (pos + n > size) {
+            throw std::bad_alloc();
+        }
+
+        int cur = pos;
+        pos += n;
+        return reinterpret_cast<T*>(data) + cur;
     }
 
-    template <class U> cpp_11_allocator(const cpp_11_allocator <U>& a) noexcept
-    {
+    void deallocate (T* p, std::size_t n) {}
 
-    }
-
-    cpp_11_allocator select_on_container_copy_construction() const
-    {
-        std::cout << "cpp_11_allocator::select_on_container_copy_construction()" << std::endl;
-        return cpp_11_allocator();
-    }
-
-    T* allocate (std::size_t n)
-    {
-        int a = sizeof(T);
-        return static_cast<T*>(::operator new(n * sizeof(T)));
-    }
-    void deallocate (T* p, std::size_t n)
-    {
-        std::destroy_n(p, n);
-    }
-
-    template <class Up, class... Args>
-    void construct(Up* p, Args&&... args)
-    {
-        ::new ((void*)p) Up(std::forward<Args>(args)...);
-    }
-
-    template<class U>
+    template< class U >
     struct rebind
     {
-        typedef cpp_11_allocator<U> other;
+        typedef pool_allocator<U> other;
     };
-
-    using propagate_on_container_copy_assignment = std::false_type;
-    using propagate_on_container_move_assignment = std::false_type;
-    using propagate_on_container_swap = std::false_type; //UB if std::false_type and a1 != a2;
 };
 
+template <typename T>
+uint8_t pool_allocator<T>::data[size];
+
+template <typename T>
+int pool_allocator<T>::pos = 0;
+
+
 template <class T, class U>
-constexpr bool operator== (const cpp_11_allocator<T>& a1, const cpp_11_allocator<U>& a2) noexcept
+constexpr bool operator== (const pool_allocator<T>& a1, const pool_allocator<U>& a2) noexcept
 {
     return true;
 }
 
 template <class T, class U>
-constexpr bool operator!= (const cpp_11_allocator<T>& a1, const cpp_11_allocator<U>& a2) noexcept
+constexpr bool operator!= (const pool_allocator<T>& a1, const pool_allocator<U>& a2) noexcept
 {
     return false;
 }
